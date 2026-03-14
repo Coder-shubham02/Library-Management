@@ -52,7 +52,7 @@ body {
 }
 
 /* Loading Bar */
-.loading-bar {
+/* .loading-bar {
     position: fixed;
     top: 0;
     left: 0;
@@ -63,7 +63,7 @@ body {
     z-index: 9999;
     opacity: 0;
     pointer-events: none;
-}
+} */
 
 @keyframes loading {
     0% { transform: translateX(-100%); }
@@ -140,6 +140,66 @@ body {
     cursor: pointer;
 }
 
+/* Submenu Container Styling */
+.submenu-container {
+    background-color: var(--hover-bg); /* Halka different background sub-menu ke liye */
+    margin: 0 15px 5px 15px;
+    border-radius: 8px;
+}
+
+.submenu-link {
+    padding: 8px 15px 8px 45px !important; /* Left margin icon ke space ke liye */
+    font-size: 0.85rem;
+    margin: 0 !important;
+    opacity: 0.8;
+}
+
+.submenu-link:hover {
+    opacity: 1;
+    background-color: transparent !important;
+    color: var(--primary-color) !important;
+    transform: translateX(5px);
+}
+
+/* Arrow Icon Rotation logic */
+.dropdown-toggle-custom[aria-expanded="true"] .arrow-icon {
+    transform: rotate(90deg);
+    transition: 0.3s;
+}
+
+.arrow-icon {
+    font-size: 0.75rem;
+    transition: 0.3s;
+}
+
+/* Hover effect on main links */
+.nav-link {
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    background-color: var(--hover-bg);
+    color: var(--primary-color);
+}
+
+/* Sidebar Scrollbar (Optional: Agar menu bahut lamba ho jaye) */
+.sidebar-content {
+    overflow-y: auto;
+    height: 100vh;
+}
+
+.sidebar-content::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 10px;
+}
+
+
 /* Desktop Sidebar */
 /* @media (min-width: 992px) {
     .sidebar {
@@ -188,10 +248,11 @@ body {
 } */
 @media (min-width: 992px) {
     .main-content {
+        width: calc(100% - 234px);
         margin-left: 234px;
-        padding: 25px 10px;
     }
 }
+
 /* Navbar Top */
 .navbar-top {
     background: var(--card-bg);
@@ -541,149 +602,3 @@ body {
     }
 }
 
-/* Seat Map */
-.seat-map-wrapper {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    margin: 0 -15px;
-    padding: 0 15px;
-}
-
-.seat-map {
-    min-width: 600px;
-}
-
-.seat-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-}
-
-.row-label {
-    width: 30px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    flex-shrink: 0;
-}
-
-.seat-item {
-    flex: 1;
-    min-width: 70px;
-    background: var(--card-bg);
-    border: 2px solid var(--border-color);
-    border-radius: 10px;
-    padding: 8px 5px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.seat-item:hover {
-    transform: translateY(-2px);
-    border-color: var(--primary-color);
-}
-
-.seat-item.occupied-morning {
-    border-color: var(--primary-color);
-    background: linear-gradient(135deg, #4361ee10, transparent);
-}
-
-.seat-item.occupied-evening {
-    border-color: var(--warning-color);
-    background: linear-gradient(135deg, #ffb70310, transparent);
-}
-
-.seat-item.occupied-full {
-    border-color: var(--success-color);
-    background: linear-gradient(135deg, #06d6a010, transparent);
-}
-
-.seat-number {
-    font-size: 1rem;
-    font-weight: 600;
-    margin-bottom: 2px;
-}
-
-.student-name {
-    font-size: 0.7rem;
-    color: var(--text-secondary);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* Student Cards (Mobile) */
-.student-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 12px;
-    margin-bottom: 10px;
-    box-shadow: var(--shadow);
-}
-
-/* Quick Actions */
-.quick-actions {
-    background: var(--card-bg);
-    border-radius: 16px;
-    padding: 15px;
-    border: 1px solid var(--border-color);
-    box-shadow: var(--shadow);
-}
-
-.quick-actions .btn {
-    padding: 10px;
-    font-size: 0.9rem;
-}
-
-/* Chart Container */
-.chart-container {
-    position: relative;
-    height: 200px;
-    width: 100%;
-}
-
-@media (min-width: 768px) {
-    .chart-container {
-        height: 250px;
-    }
-}
-
-/* Badges */
-.badge {
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-weight: 500;
-    font-size: 0.75rem;
-}
-
-.badge-shift-morning {
-    background: #4361ee20;
-    color: var(--primary-color);
-}
-
-.badge-shift-evening {
-    background: #ffb70320;
-    color: #fb8b24;
-}
-
-.badge-shift-full {
-    background: #06d6a020;
-    color: #06d6a0;
-}
-
-/* Scrollbar */
-::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--bg-primary);
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
-    border-radius: 10px;
-}

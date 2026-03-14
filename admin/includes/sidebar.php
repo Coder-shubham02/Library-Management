@@ -27,32 +27,59 @@
             <h4 class="mb-0">LibraryPro X</h4>
             <p class="text-secondary small mt-2">Enterprise Management</p>
         </div>
-        
+
         <nav class="nav flex-column">
             <a class="nav-link active" href="index.php">
                 <i class="fas fa-tachometer-alt"></i>
                 <span>Dashboard</span>
             </a>
-            <a class="nav-link" href="#">
-                <i class="fas fa-chair"></i>
-                <span>Seat Manager</span>
-            </a>
-            <a class="nav-link" href="#">
-                <i class="fas fa-users"></i>
-                <span>Students</span>
-            </a>
+
+            <div class="nav-item">
+                <a class="nav-link dropdown-toggle-custom" data-bs-toggle="collapse" href="#seatMenu">
+                    <i class="fas fa-chair"></i>
+                    <span>Seat Manager</span>
+                    <i class="fas fa-chevron-right ms-auto arrow-icon"></i>
+                </a>
+                <div class="collapse submenu-container" id="seatMenu">
+                    <a class="nav-link submenu-link" href="add_seat.php">Add New Seat</a>
+                </div>
+            </div>
+
+            <div class="nav-item">
+                <a class="nav-link dropdown-toggle-custom" data-bs-toggle="collapse" href="#studentMenu">
+                    <i class="fas fa-users"></i>
+                    <span>Students</span>
+                    <i class="fas fa-chevron-right ms-auto arrow-icon"></i>
+                </a>
+                <div class="collapse submenu-container" id="studentMenu">
+                    <a class="nav-link submenu-link" href="add-student.php">Add New Student</a>
+                    <a class="nav-link submenu-link" href="manage-students.php">Manage Students</a>
+                    <a class="nav-link submenu-link" href="attendance.php">Attendance</a>
+                </div>
+            </div>
+
             <a class="nav-link" href="#">
                 <i class="fas fa-clock"></i>
                 <span>Shifts</span>
             </a>
-            <a class="nav-link" href="#">
-                <i class="fas fa-credit-card"></i>
-                <span>Payments</span>
-            </a>
+
+            <div class="nav-item">
+                <a class="nav-link dropdown-toggle-custom" data-bs-toggle="collapse" href="#paymentMenu">
+                    <i class="fas fa-credit-card"></i>
+                    <span>Payments</span>
+                    <i class="fas fa-chevron-right ms-auto arrow-icon"></i>
+                </a>
+                <div class="collapse submenu-container" id="paymentMenu">
+                    <a class="nav-link submenu-link" href="collect-fees.php">Collect Fees</a>
+                    <a class="nav-link submenu-link" href="fee-history.php">Fee History</a>
+                </div>
+            </div>
+
             <a class="nav-link" href="#">
                 <i class="fas fa-chart-pie"></i>
                 <span>Analytics</span>
             </a>
+
             <a class="nav-link" href="#">
                 <i class="fas fa-cog"></i>
                 <span>Settings</span>
@@ -66,16 +93,21 @@
             </div>
             <div class="mt-3">
                 <div class="d-flex align-items-center">
-                    <img src="https://ui-avatars.com/api/?name=Library+Owner&background=4361ee&color=fff&bold=true" 
-                         alt="Profile" 
-                         class="rounded-circle me-2"
-                         width="32"
-                         height="32">
+                    <img src="https://ui-avatars.com/api/?name=Library+Owner&background=4361ee&color=fff&bold=true"
+                        alt="Profile"
+                        class="rounded-circle me-2"
+                        width="32"
+                        height="32">
                     <div>
                         <p class="mb-0 small fw-semibold">Library Owner</p>
                         <p class="mb-0 text-secondary small">admin@library.com</p>
                     </div>
                 </div>
+                <!-- Logout Button with Confirmation -->
+                <a href="logout.php" class="btn btn-danger w-100 mt-2" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt me-2"></i>
+                    <span>Logout</span>
+                </a>
             </div>
         </div>
     </div>

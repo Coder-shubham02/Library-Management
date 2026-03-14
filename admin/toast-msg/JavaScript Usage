@@ -1,0 +1,14 @@
+// Simple
+toastSuccess('Success message');
+toastError('Error message');
+toastWarning('Warning message');
+toastInfo('Info message');
+
+// Advanced
+showToast({
+    message: 'Custom toast',
+    type: 'info',
+    title: 'Title',
+    duration: 5000,
+    position: 'bottom-center'
+});
