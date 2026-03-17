@@ -1,0 +1,238 @@
+/* Live Seats Page Styles */
+.live-seats-page {
+    padding: 1.5rem 0;
+}
+
+/* Room Section */
+.room-section {
+    background: var(--card-bg);
+    border-radius: 24px;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.room-section:hover {
+    box-shadow: var(--shadow-hover);
+}
+
+.room-header {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.room-icon {
+    width: 50px;
+    height: 50px;
+    background: var(--gradient-1);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.3rem;
+}
+
+/* Seats Grid */
+.seats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Seat Card */
+.seat-card {
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.seat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.seat-card.free {
+    border-color: #06d6a0;
+}
+
+.seat-card.occupied {
+    border-color: #ffb703;
+}
+
+.seat-card.inactive {
+    border-color: #ef476f;
+    opacity: 0.7;
+}
+
+/* Seat Header */
+.seat-header {
+    padding: 1rem;
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.seat-number {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+}
+
+/* Seat Body */
+.seat-body {
+    padding: 1rem;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Seat Footer */
+.seat-footer {
+    padding: 0.8rem 1rem;
+    background: var(--bg-primary);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+}
+
+/* Loading Animation */
+.loading {
+    position: relative;
+    overflow: hidden;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    100% {
+        left: 100%;
+    }
+}
+
+/* Dark Mode */
+[data-theme="dark"] .seat-card {
+    background: var(--card-bg);
+}
+
+[data-theme="dark"] .seat-header,
+[data-theme="dark"] .seat-footer {
+    background: var(--hover-bg);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .seats-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    
+    .room-section {
+        padding: 1rem;
+    }
+    
+    .room-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .seats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Custom Styles for View Page */
+.avatar-large {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: var(--gradient-1);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin: 0 auto;
+    border: 4px solid var(--primary-color);
+}
+
+.seat-badge {
+    width: 70px;
+    height: 70px;
+    background: var(--gradient-1);
+    color: white;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+/* Card Hover Effects */
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
+}
+
+/* Dark Mode Adjustments */
+[data-theme="dark"] .bg-light {
+    background: var(--hover-bg) !important;
+}
+
+[data-theme="dark"] .table {
+    color: var(--text-primary);
+}
+[data-theme="dark"] body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+/* Card aur Sidebar ke liye */
+[data-theme="dark"] .card, 
+[data-theme="dark"] .sidebar {
+    background-color: var(--card-bg) !important;
+    border-color: var(--border-color);
+}
+/* Responsive */
+@media (max-width: 768px) {
+    .avatar-large {
+        width: 100px;
+        height: 100px;
+        font-size: 2rem;
+    }
+    
+    .seat-badge {
+        width: 60px;
+        height: 60px;
+        font-size: 1.2rem;
+    }
+}

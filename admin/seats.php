@@ -3,35 +3,37 @@ require "config/database.php";
 include 'includes/header.php';
 include 'includes/sidebar.php';
 
-// Toast configuration - Uncomment if you have toast
-// require_once 'includes/toast-config.php';
-
 // Pagination Logic
-$limit = 10; // Records per page
+$limit = 10; 
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 if ($page < 1) $page = 1;
 
 $start = ($page - 1) * $limit;
 
-// Get total seats count
+// 1. (Total Seats Count)
 $total_query = "SELECT COUNT(*) as total FROM seats";
 $total_result = $conn->query($total_query);
 $total_row = $total_result->fetch_assoc();
 $total_seats = $total_row['total'];
 $total_pages = ceil($total_seats / $limit);
 
-// Ensure page doesn't exceed total pages
-if ($total_pages > 0 && $page > $total_pages) {
-    $page = $total_pages;
-    $start = ($page - 1) * $limit;
-}
 
-// Get paginated seats
-$query = "SELECT * FROM seats ORDER BY seat_number ASC LIMIT ?, ?";
-$stmt = $conn->prepare($query);
+$sql = "SELECT seats.*, shifts.shift_name 
+        FROM seats 
+        LEFT JOIN shifts ON seats.shift_id = shifts.id 
+        ORDER BY seats.seat_number ASC 
+        LIMIT ?, ?";
+
+$stmt = $conn->prepare($sql);
 $stmt->bind_param("ii", $start, $limit);
 $stmt->execute();
 $result = $stmt->get_result();
+
+// Ensure page check
+if ($total_pages > 0 && $page > $total_pages) {
+    header("Location: ?page=$total_pages");
+    exit;
+}
 ?>
 <link rel="stylesheet" href="assets/css/seat.css">
 <!-- Page Content -->
@@ -84,10 +86,10 @@ $result = $stmt->get_result();
                         <table class="table table-hover align-middle mb-0 custom-table">
                             <thead class="table-light-header">
                                 <tr>
-                                    <th class="ps-4" style="width: 30%;">Seat Info</th>
-                                    <th style="width: 25%;">Room</th>
-                                    <th style="width: 20%;">Status</th>
-                                    <th class="text-end pe-4" style="width: 25%;">Actions</th>
+                                    <th class="ps-4" style="width: 25%;">Seat Info</th>
+                                    <th style="width: 20%;">Room</th>
+                                    <th style="width: 20%;">Shift</th> <th style="width: 15%;">Status</th>
+                                    <th class="text-end pe-4" style="width: 20%;">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="seatTableBody">
@@ -115,6 +117,12 @@ $result = $stmt->get_result();
                                             <span class="text-secondary">
                                                 <i class="fas fa-door-open me-2"></i>
                                                 <?php echo htmlspecialchars($row['room']); ?>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-light text-dark">
+                                                <i class="fas fa-clock me-1"></i>
+                                                <?php echo $row['shift_name'] ?? 'N/A'; ?>
                                             </span>
                                         </td>
                                         <td>

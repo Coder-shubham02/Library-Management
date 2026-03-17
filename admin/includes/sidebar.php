@@ -42,6 +42,8 @@
                 </a>
                 <div class="collapse submenu-container" id="seatMenu">
                     <a class="nav-link submenu-link" href="add_seat.php">Add New Seat</a>
+                    <a class="nav-link submenu-link" href="seats.php">All Seats</a>
+                    <a class="nav-link submenu-link" href="live-seats.php">Live Seats</a>
                 </div>
             </div>
 
@@ -53,7 +55,7 @@
                 </a>
                 <div class="collapse submenu-container" id="studentMenu">
                     <a class="nav-link submenu-link" href="add-student.php">Add New Student</a>
-                    <a class="nav-link submenu-link" href="manage-students.php">Manage Students</a>
+                    <a class="nav-link submenu-link" href="students.php">Manage Students</a>
                     <a class="nav-link submenu-link" href="attendance.php">Attendance</a>
                 </div>
             </div>

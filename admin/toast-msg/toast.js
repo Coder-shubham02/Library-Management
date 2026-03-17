@@ -146,12 +146,14 @@ function closeToast(toast) {
     
     // Remove after animation
     setTimeout(() => {
-        if (toast.parentElement) {
-            toast.parentElement.removeChild(toast);
+        
+        if (toast && toast.parentElement) {
+            var parent = toast.parentElement;
+            parent.removeChild(toast);
             
             // Remove container if empty
-            if (toast.parentElement.children.length === 0) {
-                toast.parentElement.remove();
+            if (parent.children.length === 0) {
+                parent.remove();
             }
         }
     }, 300);

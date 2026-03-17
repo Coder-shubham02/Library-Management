@@ -34,7 +34,7 @@ if ($multipleToasts) {
 }
 
 .toast-container {
-    position: fixed;
+    position: fixed !important;
     z-index: 9999;
     pointer-events: none;
     display: flex;
