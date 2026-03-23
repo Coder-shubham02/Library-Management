@@ -5,7 +5,6 @@ include 'includes/sidebar.php';
 
 ?>
 <style>
-<style>
 /* Placeholder Styling */
 [data-theme="dark"] input::placeholder, 
 [data-theme="dark"] textarea::placeholder,

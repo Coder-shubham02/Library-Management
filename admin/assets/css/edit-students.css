@@ -1,0 +1,88 @@
+/* Form Styling with Dark Mode Support */
+.form-label {
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.form-control, .form-select {
+    background: var(--input-bg);
+    border: 2px solid ;
+    color: var(--text-primary);
+    border-radius: 12px;
+    padding: 0.6rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    background: var(--card-bg);
+    outline: none;
+}
+
+.input-group-text {
+    background: var(--input-bg);
+    border: 2px solid var(--border-color);
+    color: var(--text-secondary);
+    border-radius: 12px 0 0 12px;
+}
+
+/* Seat Selection */
+.seat-selection-wrapper {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--card-bg) !important;
+}
+
+.seat-item {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid var(--border-color) !important;
+    background: var(--card-bg);
+    color: var(--text-primary);
+}
+
+.seat-item:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary-color) !important;
+    background: rgba(67, 97, 238, 0.05);
+}
+
+.seat-item.selected {
+    border-color: var(--primary-color) !important;
+    background: rgba(67, 97, 238, 0.1);
+    box-shadow: 0 5px 15px rgba(67, 97, 238, 0.2);
+}
+
+/* Dark Mode Support */
+[data-theme="dark"] .bg-light {
+    background: var(--hover-bg) !important;
+}
+
+[data-theme="dark"] .alert-info {
+    background: rgba(67, 97, 238, 0.2);
+    color: var(--text-primary);
+    border-color: var(--primary-color);
+}
+
+[data-theme="dark"] .seat-item {
+    background: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .seat-item.selected {
+    background: rgba(67, 97, 238, 0.2);
+}
+[data-theme="dark"] .card {
+    background: rgba(67, 97, 238, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .seat-selection-wrapper {
+        max-height: 250px;
+    }
+}

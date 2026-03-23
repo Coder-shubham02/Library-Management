@@ -319,9 +319,11 @@ $history_result = $history_stmt->get_result();
                         <h5 class="fw-bold mt-2 text-<?php echo ($student['total_due'] ?? 0) > 0 ? 'danger' : 'success'; ?>">
                             ₹<?php echo number_format($student['total_due'] ?? 0, 2); ?>
                         </h5>
-                        <?php if($student['next_due_date']): ?>
-                        <small class="text-secondary d-block">Next due: <?php echo date('d M Y', strtotime($student['next_due_date'])); ?></small>
-                        <?php endif; ?>
+                        <?php if(isset($student['next_due_date']) && $student['next_due_date']): ?>
+    <small class="text-secondary d-block">
+        Next due: <?php echo date('d M Y', strtotime($student['next_due_date'])); ?>
+    </small>
+<?php endif; ?>
                     </div>
                 </div>
                 <div class="col-md-3 col-6">

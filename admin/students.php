@@ -65,6 +65,8 @@ $total_pages = ceil($total_students / $limit);
 
 // [NEW] ============ UPDATED QUERY WITH MONTHLY PAYMENT LOGIC ============
 // Yeh query ab sirf due amount tab dikhayegi jab due date aaj ya usse pehle ki ho
+// In your students.php query, update the due calculation:
+
 $query = "SELECT 
             s.*,
             sa.id as allocation_id,
@@ -80,28 +82,28 @@ $query = "SELECT
             sh.end_time as shift_end,
             sh.fee_amount,
             
-            -- [NEW] Sirf pending payments count karo jinka due date aa chuka hai
+            -- ===== FIX: Sirf wo payments jinka due date aa chuka hai =====
             (SELECT COUNT(*) 
              FROM payments p 
              WHERE p.student_id = s.id 
              AND p.payment_status = 'pending'
-             AND p.due_date <= CURDATE()  -- Sirf wo jinka due date aaj ya pehle ka hai
+             AND p.due_date <= CURDATE()
             ) as pending_payments,
             
-            -- [NEW] Sirf due amount dikhao jiska due date aa chuka hai
+            -- Total due (past due only)
             (SELECT SUM(p.amount - p.paid_amount) 
              FROM payments p 
              WHERE p.student_id = s.id 
              AND p.payment_status IN ('pending', 'partial')
-             AND p.due_date <= CURDATE()  -- Sirf wo jinka due date aaj ya pehle ka hai
+             AND p.due_date <= CURDATE()
             ) as total_due,
             
-            -- [NEW] Next due date dikhane ke liye (optional)
+            -- Next due date
             (SELECT MIN(p.due_date) 
              FROM payments p 
              WHERE p.student_id = s.id 
              AND p.payment_status = 'pending'
-             AND p.due_date > CURDATE()   -- Future due dates
+             AND p.due_date > CURDATE()
             ) as next_due_date
             
           FROM students s

@@ -3,18 +3,19 @@ require "config/database.php";
 include 'includes/header.php';
 include 'includes/sidebar.php';
 
-// Toast configuration
-// require_once 'includes/toast-config.php';
-
 // Get all active shifts from database
 $shifts_query = "SELECT * FROM shifts WHERE status = 'active' ORDER BY id";
 $shifts_result = $conn->query($shifts_query);
 
-// Get all active seats with their shift info
-$seats_query = "SELECT s.*, sh.shift_name 
+// ===== FIX 1: Sirf FREE seats dikhao (jo allocated nahi hain) =====
+$seats_query = "SELECT s.*, sh.shift_name,
+                (SELECT COUNT(*) FROM seat_allocations sa 
+                 WHERE sa.seat_id = s.id 
+                 AND sa.status = 'active') as is_allocated
                 FROM seats s 
                 LEFT JOIN shifts sh ON s.shift_id = sh.id 
                 WHERE s.status = 'active' 
+                HAVING is_allocated = 0  -- Sirf free seats
                 ORDER BY s.room, s.seat_number";
 $seats_result = $conn->query($seats_query);
 
@@ -31,6 +32,7 @@ if ($seats_result && $seats_result->num_rows > 0) {
 }
 ?>
 <link rel="stylesheet" href="assets/css/add-student.css">
+
 <!-- Page Content -->
 <div class="container-fluid py-4">
     <div class="row">
@@ -246,14 +248,14 @@ if ($seats_result && $seats_result->num_rows > 0) {
                                                         <?php echo $shift['shift_name']; ?> 
                                                         (<?php echo date('h:i A', strtotime($shift['start_time'])); ?> - 
                                                         <?php echo date('h:i A', strtotime($shift['end_time'])); ?>)
-                                                        - ₹<?php echo $shift['fee_amount']; ?>
+                                                        - ₹<?php echo $shift['fee_amount']; ?>/month
                                                     </option>
                                                 <?php endwhile; ?>
                                             <?php endif; ?>
                                         </select>
                                     </div>
 
-                                    <!-- Room Selection (Dynamic based on seats) -->
+                                    <!-- Room Selection -->
                                     <div class="col-md-6">
                                         <label class="form-label fw-semibold small text-uppercase">
                                             Select Room
@@ -268,7 +270,7 @@ if ($seats_result && $seats_result->num_rows > 0) {
                                         </select>
                                     </div>
 
-                                    <!-- Seat Selection (Dynamic based on room & shift) -->
+                                    <!-- Seat Selection -->
                                     <div class="col-12">
                                         <label class="form-label fw-semibold small text-uppercase">
                                             Select Seat <span class="text-danger">*</span>
@@ -315,6 +317,7 @@ if ($seats_result && $seats_result->num_rows > 0) {
                                             </span>
                                             <input type="date" 
                                                    name="start_date" 
+                                                   id="startDate"
                                                    class="form-control border-start-0" 
                                                    value="<?php echo date('Y-m-d'); ?>" 
                                                    required>
@@ -386,6 +389,23 @@ if ($seats_result && $seats_result->num_rows > 0) {
                                         </div>
                                     </div>
 
+                                    <!-- ===== FIX 3: Back date ke hisaab se due amount ===== -->
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold small text-uppercase">
+                                            Total Due (Past Months)
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text border-end-0">
+                                                <i class="fas fa-clock"></i>
+                                            </span>
+                                            <input type="text" 
+                                                   id="totalDueDisplay" 
+                                                   class="form-control border-start-0 fw-bold text-danger" 
+                                                   readonly 
+                                                   value="₹0.00">
+                                        </div>
+                                    </div>
+
                                     <!-- Payment Status -->
                                     <div class="col-md-6">
                                         <label class="form-label fw-semibold small text-uppercase">
@@ -445,14 +465,18 @@ if ($seats_result && $seats_result->num_rows > 0) {
                                     <div class="col-12 mt-3">
                                         <div class="card bg-primary bg-opacity-10 border-0">
                                             <div class="card-body">
-                                                <h6 class="fw-bold mb-3">Summary</h6>
+                                                <h6 class="fw-bold mb-3">Payment Summary</h6>
                                                 <div class="row g-2">
-                                                    <div class="col-6">
+                                                    <div class="col-4">
                                                         <small class="text-secondary">Monthly Fee:</small>
                                                         <div class="fw-bold" id="summaryFee">₹0.00</div>
                                                     </div>
-                                                    <div class="col-6">
-                                                        <small class="text-secondary">Due Amount:</small>
+                                                    <div class="col-4">
+                                                        <small class="text-secondary">Past Months:</small>
+                                                        <div class="fw-bold" id="summaryPastMonths">0</div>
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <small class="text-secondary">Total Due:</small>
                                                         <div class="fw-bold text-danger" id="summaryDue">₹0.00</div>
                                                     </div>
                                                 </div>
@@ -482,6 +506,7 @@ if ($seats_result && $seats_result->num_rows > 0) {
 </div>
 
 <?php include 'includes/footer.php'; ?>
+
 <!-- JavaScript -->
 <script>
 $(document).ready(function() {
@@ -500,26 +525,59 @@ $(document).ready(function() {
     $('#shiftSelect').change(function() {
         const shiftId = $(this).val();
         const selectedOption = $(this).find('option:selected');
-        
-        // Yahan fix kiya hai: parseFloat use karke ensure karein ki ye number hi ho
         const feeAmount = parseFloat(selectedOption.data('fee')) || 0;
         
-        // Ab .toFixed(2) error nahi dega kyunki feeAmount pakka ek Number hai
-        const formattedFee = '₹' + feeAmount.toFixed(2);
-        
-        // Update fee display
-        $('#feeDisplay').val(formattedFee);
-        $('#summaryFee').text(formattedFee);
-        $('#summaryDue').text(formattedFee);
-
-        // Filter seats by shift
+        $('#feeDisplay').val('₹' + feeAmount.toFixed(2));
+        calculateTotalDue();
         filterSeatsByShift(shiftId);
         
-        // Clear selected seat
         $('.seat-item.selected').removeClass('selected');
         $('#selectedSeatId').val('');
         $('#selectedSeatNumber').val('');
     });
+
+    // ============ START DATE CHANGE ============
+    $('#startDate').change(function() {
+        calculateTotalDue();
+    });
+
+    // ===== Calculate total due for back dates =====
+    function calculateTotalDue() {
+        const startDate = $('#startDate').val();
+        const feeAmount = parseFloat($('#feeDisplay').val().replace('₹', '')) || 0;
+        
+        if (!startDate || feeAmount === 0) {
+            $('#totalDueDisplay').val('₹0.00');
+            $('#summaryPastMonths').text('0');
+            $('#summaryDue').text('₹0.00');
+            return;
+        }
+        
+        const start = new Date(startDate);
+        const today = new Date();
+        
+        if (start > today) {
+            $('#totalDueDisplay').val('₹0.00');
+            $('#summaryPastMonths').text('0');
+            $('#summaryDue').text('₹0.00');
+            return;
+        }
+        
+        let months = (today.getFullYear() - start.getFullYear()) * 12;
+        months -= start.getMonth();
+        months += today.getMonth();
+        
+        if (today.getDate() < start.getDate()) {
+            months--;
+        }
+        
+        months = Math.max(0, months);
+        const totalDue = months * feeAmount;
+        
+        $('#totalDueDisplay').val('₹' + totalDue.toFixed(2));
+        $('#summaryPastMonths').text(months);
+        $('#summaryDue').text('₹' + totalDue.toFixed(2));
+    }
 
     // ============ FILTER SEATS BY SHIFT ============
     function filterSeatsByShift(shiftId) {
@@ -530,7 +588,6 @@ $(document).ready(function() {
 
         $('.seat-option').each(function() {
             const seatShift = $(this).data('shift');
-            // Show seats that match shift OR have no shift (NULL)
             if (seatShift == shiftId || seatShift === '' || seatShift === null) {
                 $(this).show();
             } else {
@@ -556,7 +613,6 @@ $(document).ready(function() {
             });
         }
         
-        // Re-apply shift filter
         const shiftId = $('#shiftSelect').val();
         if (shiftId) {
             filterSeatsByShift(shiftId);
@@ -571,8 +627,8 @@ $(document).ready(function() {
             $('#paidAmountField, #paymentMethodField, #transactionField').show();
             
             if (status === 'paid') {
-                const fee = parseFloat($('#feeDisplay').val().replace('₹', '')) || 0;
-                $('#paidAmount').val(fee.toFixed(2));
+                const totalDue = parseFloat($('#totalDueDisplay').val().replace('₹', '')) || 0;
+                $('#paidAmount').val(totalDue.toFixed(2));
                 $('#summaryDue').text('₹0.00');
             } else {
                 $('#paidAmount').val('');
@@ -580,7 +636,7 @@ $(document).ready(function() {
             }
         } else {
             $('#paidAmountField, #paymentMethodField, #transactionField').hide();
-            $('#summaryDue').text($('#summaryFee').text());
+            $('#summaryDue').text($('#totalDueDisplay').val());
         }
     });
 
@@ -590,13 +646,13 @@ $(document).ready(function() {
     });
 
     function updateDueAmount() {
-        const fee = parseFloat($('#summaryFee').text().replace('₹', '')) || 0;
+        const totalDue = parseFloat($('#totalDueDisplay').val().replace('₹', '')) || 0;
         const paid = parseFloat($('#paidAmount').val()) || 0;
-        const due = Math.max(0, fee - paid);
+        const due = Math.max(0, totalDue - paid);
         $('#summaryDue').text('₹' + due.toFixed(2));
     }
 
-    // ============ FORM SUBMISSION ============
+    // ============ FORM SUBMISSION - WITH TOAST MESSAGES ============
     $('#addStudentForm').submit(function(e) {
         e.preventDefault();
         
@@ -605,13 +661,14 @@ $(document).ready(function() {
             if (typeof toastError === 'function') {
                 toastError('Please select a seat', 'Validation Error');
             } else {
-                alert('Please select a seat');
+                alert('Please select a seat'); // Fallback
             }
             return;
         }
 
         const formData = new FormData(this);
         const btn = $('#submitBtn');
+        const originalText = btn.html();
         
         btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Registering...');
 
@@ -624,63 +681,51 @@ $(document).ready(function() {
             dataType: 'json',
             success: function(response) {
                 if (response.status === 'success') {
+                    // ✅ SUCCESS TOAST
                     if (typeof toastSuccess === 'function') {
                         toastSuccess(response.message, 'Success');
+                    } else {
+                        alert('Success: ' + response.message);
                     }
                     
-                    // Reset form and show success message
                     setTimeout(function() {
                         window.location.href = 'students.php';
                     }, 2000);
                 } else {
+                    // ❌ ERROR TOAST
                     if (typeof toastError === 'function') {
                         toastError(response.message, 'Error');
                     } else {
                         alert('Error: ' + response.message);
                     }
-                    btn.prop('disabled', false).html('<i class="fas fa-save me-2"></i>Register Student');
+                    btn.prop('disabled', false).html(originalText);
                 }
             },
             error: function(xhr, status, error) {
                 console.error('AJAX Error:', error);
+                // ❌ SYSTEM ERROR TOAST
                 if (typeof toastError === 'function') {
                     toastError('Failed to register student', 'System Error');
                 } else {
                     alert('Failed to register student');
                 }
-                btn.prop('disabled', false).html('<i class="fas fa-save me-2"></i>Register Student');
+                btn.prop('disabled', false).html(originalText);
             }
         });
-    });
-
-    // ============ FORM VALIDATION ============
-    $('#addStudentForm input, #addStudentForm select').on('invalid', function() {
-        // Move to the tab containing this field
-        const tabId = $(this).closest('.tab-pane').attr('id');
-        if (tabId) {
-            $(`#${tabId}-tab`).tab('show');
-        }
     });
 });
 
 // ============ GLOBAL SEAT SELECT FUNCTION ============
 function selectSeat(element) {
-    // Remove selection from other seats
     $('.seat-item').removeClass('selected');
-    
-    // Add selection to clicked seat
     $(element).addClass('selected');
     
-    // Set hidden inputs
-    const seatId = $(element).data('seat-id');
-    const seatNumber = $(element).data('seat-number');
+    $('#selectedSeatId').val($(element).data('seat-id'));
+    $('#selectedSeatNumber').val($(element).data('seat-number'));
     
-    $('#selectedSeatId').val(seatId);
-    $('#selectedSeatNumber').val(seatNumber);
-    
-    // Show success feedback
+    // ✅ SEAT SELECTION TOAST
     if (typeof toastSuccess === 'function') {
-        toastSuccess(`Seat ${seatNumber} selected`, 'Seat Selected');
+        toastSuccess(`Seat ${$(element).data('seat-number')} selected`, 'Seat Selected');
     }
 }
 </script>
